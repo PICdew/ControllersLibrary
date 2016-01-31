@@ -1,21 +1,28 @@
 /** TaskManager.h
- * v.1.0
+ * v.1.1
  */
 
 #ifndef TASKMANAGER_H
 #define	TASKMANAGER_H
 
 #include <xc.h>
+#include "Config.h"
 
-#define	TasksQueueSize 10
+#ifndef TaskManagerQueueSize
+    #error "TaskManagerQueueSize symbol is not defined, you should define it in file Config.h before using this library"
+#endif
+
+#ifndef TaskManagerTimerType
+    #error "TaskManagerTimerType symbol is not defined, you should define it in file Config.h before using this library"
+#endif
 
 typedef void (*TPtr)(void);
 
-typedef unsigned char TTimer;
+typedef TaskManagerTimerType TTimer;
 
-TPtr TasksQueue[TasksQueueSize];
+TPtr TasksQueue[TaskManagerQueueSize];
 
-TTimer TimersQueue[TasksQueueSize];
+TTimer TimersQueue[TaskManagerQueueSize];
 
 void Idle();
 
