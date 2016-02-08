@@ -1,5 +1,5 @@
 /** TaskManager.c
- * v.1.2
+ * v.1.3
  */
 
 #include "TaskManager.h"
@@ -81,6 +81,25 @@ void AddTask(TPtr pTask, TTimer time) {
             // добавить вместо нее новую
             TasksQueue[i] = pTask;
             TimersQueue[i] = time;
+            break;
+        }
+    }
+    ei();
+}
+
+void RemoveTask(TPtr pTask) {
+    di();
+    for (unsigned char i = 0; i != TaskManagerQueueSize; i++) {
+        // если задача найдена
+        if (TasksQueue[i] == pTask) {
+            // сдвинуть все задачи до найденной
+            for (unsigned char j = i; j != TaskManagerQueueSize - 1; j++) {
+                TasksQueue[j] = TasksQueue[j + 1];
+                TimersQueue[j] = TimersQueue[j + 1];
+            }
+            // в конец очереди установить задачу-заглушку
+            TasksQueue[TaskManagerQueueSize - 1] = pIdle;
+            TimersQueue[TaskManagerQueueSize - 1] = 0;
             break;
         }
     }
