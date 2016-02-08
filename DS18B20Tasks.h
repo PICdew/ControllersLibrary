@@ -1,5 +1,5 @@
 /** DS18B20Tasks.h
- * v.1.0
+ * v.1.1
  */
 
 #ifndef DS18B20TASKS_H
@@ -38,5 +38,10 @@ void DS18B20ConvertTemperatureAction();
 
 void DS18B20GetTemperatureTask();
 void DS18B20GetTemperatureAction();
+
+/** Удаляет все задачи, связанные с библиотекой, из очереди диспетчера задач.
+ * Хотя в один момент времени в очереди находится только одна связанная задача, для гарантированного удаления из очереди любой связанной задачи следует использовать эту функцию.
+ */
+void DS18B20RemoveAllTasks();
 
 #endif /* DS18B20TASKS_H */
