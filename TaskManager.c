@@ -1,5 +1,5 @@
 /** TaskManager.c
- * v.1.3
+ * v.1.4
  */
 
 #include "TaskManager.h"
@@ -41,8 +41,8 @@ void TaskManager() {
             break;
         }
     }
-    ei();
     pTask();
+    ei();
 }
 
 void TimerService() {

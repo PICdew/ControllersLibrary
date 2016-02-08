@@ -1,5 +1,5 @@
 /** TaskManager.h
- * v.1.3
+ * v.1.4
  */
 
 #ifndef TASKMANAGER_H
