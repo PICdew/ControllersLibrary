@@ -1,5 +1,5 @@
 /** DS18B20Async.c
- * v.1.0
+ * v.1.1
  */
 
 #include "DS18B20Async.h"
@@ -11,15 +11,15 @@ void DS18B20ResetPulseStageTask() {
 void DS18B20SendCommandStageTask() {
     if (OneWireHasPresencePulseDetected) {
         switch (DS18B20CommandStage) {
-            case 0: {
+            case DS18B20WriteScratchpadCommandStage: {
                 OneWireWriteByteAsync(DS18B20SkipROMCommand, DS18B20SendWriteScratchpadCommandTask);
                 break;
             }
-            case 1: {
+            case DS18B20ConvertTCommandStage: {
                 OneWireWriteByteAsync(DS18B20SkipROMCommand, DS18B20SendConvertTCommandTask);
                 break;
             }
-            case 2: {
+            case DS18B20ReadScratchpadCommandStage: {
                 OneWireWriteByteAsync(DS18B20SkipROMCommand, DS18B20SendReadScratchpadCommandTask);
                 break;
             }
