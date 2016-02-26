@@ -1,65 +1,49 @@
 /** DS18B20Tasks.c
- * v.1.2
+ * v.1.3
  */
 
 #include "DS18B20Tasks.h"
-#include "DS18B20.h"
-#include "TaskManager.h"
-#include "Delay.h"
 
-void DS18B20InitializeSensorTask() {
-    DS18B20InitializeSensorAction();
-    if (DS18B20ResultInitializeSensor == DS18B20OperationOK) {
-        AddTask(DS18B20ConvertTemperatureTask, DS18B20ConvertTemperatureTaskDelay);
+void DS18B20WriteScratchpadTask() {
+    DS18B20WriteScratchpad();
+    if (DS18B20LastError == DS18B20OperationOK) {
+        AddTask(DS18B20ConvertTemperatureTask, 0);
     }
     else {
-        AddTask(DS18B20InitializeSensorTask, DS18B20RepeatInitializeSensorTaskDelay);
+        AddTask(DS18B20WriteScratchpadTask, DS18B20PresencePulseNotDetectedDelay);
     }
 }
 
 void DS18B20ConvertTemperatureTask() {
-    DS18B20ConvertTemperatureAction();
-    if (DS18B20ResultConvertTemperature == DS18B20OperationOK) {
-        AddTask(DS18B20GetTemperatureTask, DS18B20GetTemperatureTaskDelay);
+    DS18B20ConvertT();
+    if (DS18B20LastError == DS18B20OperationOK) {
+        AddTask(DS18B20ReadScratchpadTask, DS18B20ConvertTemperatureDelay);
     }
     else {
-        AddTask(DS18B20InitializeSensorTask, DS18B20RepeatInitializeSensorTaskDelay);
+        AddTask(DS18B20WriteScratchpadTask, DS18B20PresencePulseNotDetectedDelay);
     }
 }
 
-void DS18B20GetTemperatureTask() {
-    DS18B20GetTemperatureAction();
-    switch (DS18B20ResultGetTemperature) {
+void DS18B20ReadScratchpadTask() {
+    DS18B20ReadScratchpad();
+    switch (DS18B20LastError) {
         case DS18B20OperationOK: {
-            AddTask(DS18B20ConvertTemperatureTask, DS18B20RepeatConvertTemperatureTaskDelay - DS18B20GetTemperatureTaskDelay);
+            AddTask(DS18B20ConvertTemperatureTask, DS18B20ReadScratchpadSuccessfullyDelay - DS18B20ConvertTemperatureDelay);
             break;
         }
-        case DS18B20PrecencePulseNotDetected:
-        case DS18B20ConvertTemperatureError: {
-            AddTask(DS18B20InitializeSensorTask, DS18B20RepeatInitializeSensorTaskDelay);
+        case DS18B20ScratchpadReadError: {
+            AddTask(DS18B20WriteScratchpadTask, DS18B20ReadScratchpadErrorDelay);
             break;
         }
         default: {
-            AddTask(DS18B20GetTemperatureTask, DS18B20RepeatGetTemperatureTaskDelay);
+            AddTask(DS18B20WriteScratchpadTask, DS18B20PresencePulseNotDetectedDelay);
             break;
         }
     }
 }
 
-void DS18B20InitializeSensorAction() {
-    DS18B20InitializeSensor();
-}
-
-void DS18B20ConvertTemperatureAction() {
-    DS18B20ConvertTemperature();
-}
-
-void DS18B20GetTemperatureAction() {
-    DS18B20GetTemperature();
-}
-
 void DS18B20RemoveAllTasks() {
-    RemoveTask(DS18B20InitializeSensorTask);
+    RemoveTask(DS18B20WriteScratchpadTask);
     RemoveTask(DS18B20ConvertTemperatureTask);
-    RemoveTask(DS18B20GetTemperatureTask);
+    RemoveTask(DS18B20ReadScratchpadTask);
 }
