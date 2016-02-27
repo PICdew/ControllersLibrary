@@ -1,9 +1,13 @@
 /** DHT22Tasks.h
- * v.1.0
+ * v.1.1
  */
 
 #ifndef DHT22TASKS_H
 #define	DHT22TASKS_H
+
+#include "Delay.h"
+#include "DHT22.h"
+#include "TaskManager.h"
 
 /** Задержка до первого выполнения задачи DHT22ReadTask (в единицах T_INT, параметр - в секундах).
  */
