@@ -1,11 +1,10 @@
 /** DHT22Tasks.h
- * v.1.1
+ * v.1.2
  */
 
 #ifndef DHT22TASKS_H
 #define	DHT22TASKS_H
 
-#include "Delay.h"
 #include "DHT22.h"
 #include "TaskManager.h"
 
