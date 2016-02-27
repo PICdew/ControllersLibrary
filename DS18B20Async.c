@@ -1,5 +1,5 @@
 /** DS18B20Async.c
- * v.1.4
+ * v.1.5
  */
 
 #include "DS18B20Async.h"
@@ -10,8 +10,8 @@ void DS18B20ResetPulseStageTask() {
 
 void DS18B20SendCommandStageTask() {
     if (!OneWireHasPresencePulseDetected) {
-        DS18B20TemperatureValueIsCorrect = 0;
         DS18B20LastError = DS18B20PrecencePulseNotDetected;
+        DS18B20TemperatureValueIsCorrect = 0;
         DS18B20CommandStage = DS18B20WriteScratchpadCommandStage;
         AddTask(DS18B20ResetPulseStageTask, DS18B20PresencePulseNotDetectedDelay);
         return;
@@ -90,6 +90,10 @@ void DS18B20CheckReadErrorsTask() {
         (DS18B20ScratchpadMemory[7] != DS18B20ScratchpadByte7)
     ) {
         DS18B20LastError = DS18B20ScratchpadReadError;
+        DS18B20ReadErrorsCount++;
+        if (DS18B20ReadErrorsCount > DS18B20MaxReadErrorsCount) {
+            DS18B20TemperatureValueIsCorrect = 0;
+        }
         DS18B20CommandStage = DS18B20WriteScratchpadCommandStage;
         AddTask(DS18B20ResetPulseStageTask, DS18B20ReadScratchpadErrorDelay);
         return;
@@ -105,8 +109,9 @@ void DS18B20CalculateTemperatureValueTask() {
     }
     DS18B20TemperatureValue.integerPart = temperatureRegister >> DS18B20TemperatureFractionalPartMaskBitsCount;
     DS18B20TemperatureValue.fractionalPart = (temperatureRegister & DS18B20TemperatureFractionalPartMask) * (10000 / 16);
-    DS18B20TemperatureValueIsCorrect = 1;
     DS18B20LastError = DS18B20OperationOK;
+    DS18B20ReadErrorsCount = 0;
+    DS18B20TemperatureValueIsCorrect = 1;
     DS18B20CommandStage = DS18B20ConvertTCommandStage;
     AddTask(DS18B20ResetPulseStageTask, DS18B20ReadScratchpadSuccessfullyDelay - DS18B20ConvertTemperatureDelay);
 }
